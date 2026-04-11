@@ -1,9 +1,9 @@
-# Voice 설정 가이드
+# Voice Setup Guide
 
-## 1. 레퍼런스 음성 파일 준비
+## 1. Reference Voice File Preparation
 
-**권장 방식 (직접 파일):**
-```
+**Recommended Method (Direct File):**
+```text
 references/
 ├── test1.mp3
 ├── test1.lab
@@ -12,8 +12,8 @@ references/
 └── korean_voice.flac
 ```
 
-**기존 방식 (폴더, 하위 호환성):**
-```
+**Legacy Method (Folder, Backward Compatibility):**
+```text
 references/
 ├── test1/
 │   ├── sample1.wav
@@ -25,53 +25,53 @@ references/
     └── voice1.lab
 ```
 
-## 2. .lab 파일 내용 예시
+## 2. .lab File Content Example
 
-```
+```text
 # test1.lab
-안녕하세요, 저는 테스트 화자입니다.
+Hello, I am a test speaker.
 
 # speaker2.lab
-이것은 두 번째 샘플 음성입니다.
+This is the second sample voice.
 ```
 
-## 3. API 사용법
+## 3. API Usage
 
-### OpenAI 호환 API 사용
+### Using OpenAI Compatible API
 ```bash
 curl -X POST "http://localhost:8080/v1/audio/speech" \
   -H "Content-Type: application/json" \
   -d '{
     "model": "tts-1",
-    "input": "안녕하세요, 테스트 음성입니다.",
+    "input": "Hello, this is a test voice.",
     "voice": "test1",
     "response_format": "mp3"
   }'
 ```
 
-### Fish Speech 네이티브 API 사용
+### Using Fish Speech Native API
 ```bash
 curl -X POST "http://localhost:8080/v1/tts" \
   -H "Content-Type: application/json" \
   -d '{
-    "text": "안녕하세요, 테스트 음성입니다.",
+    "text": "Hello, this is a test voice.",
     "reference_id": "test1",
     "format": "wav"
   }'
 ```
 
-## 4. 동작 방식
+## 4. How It Works
 
-- OpenAI API의 `voice: "test1"` → Fish Speech의 `reference_id: "test1"`로 변환
-- **우선순위 1**: `references/test1.mp3` (또는 .wav, .flac 등) 직접 파일 사용
-- **우선순위 2**: `references/test1/` 폴더의 모든 오디오 파일 사용 (하위 호환성)
-- 같은 이름의 `.lab` 파일이 있으면 텍스트 프롬프트로 함께 사용
+- Converts OpenAI API's `voice: "test1"` → Fish Speech's `reference_id: "test1"`
+- **Priority 1**: Uses a direct file like `references/test1.mp3` (or .wav, .flac, etc.)
+- **Priority 2**: Uses all audio files in the `references/test1/` folder (backward compatibility)
+- If a `.lab` file with the same name exists, it is used together as a text prompt.
 
-## 5. 파일 우선순위
+## 5. File Priority
 
-시스템은 다음 순서로 파일을 찾습니다:
+The system searches for files in the following order:
 1. `references/test1.mp3`
 2. `references/test1.wav`
 3. `references/test1.flac`
-4. ... (기타 지원 확장자)
-5. `references/test1/` 폴더 내 파일들 (폴백)
+4. ... (Other supported extensions)
+5. Files inside the `references/test1/` folder (Fallback)
